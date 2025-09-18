@@ -14,7 +14,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/questions', questionsRoutes);
 app.use('/api/quiz', quizRoutes);
 
-// health
+// health to check
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 export default app;
