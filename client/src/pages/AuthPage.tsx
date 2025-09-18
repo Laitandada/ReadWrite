@@ -28,8 +28,6 @@ export default function AuthPage() {
       setLoading(true);
       if (mode === "register") {
         const { data } = await api.post("/auth/register", { email, password, name });
-    
-
         await api.post("/auth/login", { email, password });
         const loginRes = await api.post("/auth/login", { email, password });
         const { token, user } = loginRes.data;
