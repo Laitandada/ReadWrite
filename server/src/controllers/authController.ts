@@ -84,7 +84,7 @@ export async function login(req: Request, res: Response) {
 
   try {
     const { rows } = await db.query(
-      "SELECT id, email, password FROM users WHERE email=$1",
+      "SELECT id, email,name, password FROM users WHERE email=$1",
       [email]
     );
 
@@ -111,10 +111,12 @@ export async function login(req: Request, res: Response) {
       { expiresIn: "7d" }
     );
 
+    
+
     return res.json({
       message: "Login successful.",
       token,
-      user: { id: user.id, email: user.email },
+      user: { id: user.id, email: user.email, name: user.name},
     });
   } catch (err) {
     console.error("Login error:", err);

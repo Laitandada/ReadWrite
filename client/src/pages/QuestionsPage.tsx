@@ -5,28 +5,40 @@ import { useAuthStore } from "../stores/authStore";
 import type { Question } from "../types/types";
 import { useNavigate } from "react-router-dom";
 import { showError } from "../utils/toastUtils";
+import { Button } from "../components/Button";
 
 function BlankQuestion() {
   return {
     question_text: "",
     options: ["", "", "", ""],
-    correct_index: 0
+    correct_index: 0,
   } as Partial<Question> & { options: string[]; correct_index: number };
 }
 
 export default function QuestionsPage() {
   const logout = useAuthStore((s) => s.logout);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Question | null>(null);
   const [form, setForm] = useState<any>(BlankQuestion());
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<string | null>(null);
 
   useEffect(() => {
     fetchQuestions();
   }, []);
+
+//   get user name from local storage
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser.name || parsedUser.email);
+        }
+    }, []);
 
   async function fetchQuestions() {
     try {
@@ -48,27 +60,33 @@ export default function QuestionsPage() {
   }
   function startQuiz() {
     // navigate to quiz page
-            navigate("/questions");
-    }
-
+    navigate("/quiz");
+  }
 
   function openEdit(q: Question) {
     setEditing(q);
     setForm({
       question_text: q.question_text,
       options: [...q.options],
-      correct_index: q.correct_index ?? 0
+      correct_index: q.correct_index ?? 0,
     });
     setShowModal(true);
   }
 
   function updateOption(idx: number, value: string) {
-    setForm((f: any) => ({ ...f, options: f.options.map((o: string, i: number) => (i === idx ? value : o)) }));
+    setForm((f: any) => ({
+      ...f,
+      options: f.options.map((o: string, i: number) => (i === idx ? value : o)),
+    }));
   }
 
   async function save() {
     setError(null);
-    if (!form.question_text || form.options.some((o: string) => !o) || form.options.length !== 4) {
+    if (
+      !form.question_text ||
+      form.options.some((o: string) => !o) ||
+      form.options.length !== 4
+    ) {
       setError("Fill question and all 4 options");
       return;
     }
@@ -77,13 +95,13 @@ export default function QuestionsPage() {
         await api.put(`/questions/${editing.id}`, {
           question_text: form.question_text,
           options: form.options,
-          correct_index: Number(form.correct_index)
+          correct_index: Number(form.correct_index),
         });
       } else {
         await api.post("/questions", {
           question_text: form.question_text,
           options: form.options,
-          correct_index: Number(form.correct_index)
+          correct_index: Number(form.correct_index),
         });
       }
       setShowModal(false);
@@ -107,24 +125,47 @@ export default function QuestionsPage() {
 
   return (
     <div className="p-6">
-      <header className="flex justify-between items-center mb-6">
+          <div className="">
+      {user && (
+        <h2 className="text-xl font-semibold mb-4">
+          👋 Welcome, {user}!
+        </h2>
+      )}
+
+      <div>
+      </div>
+    </div>
+      <header className="flex flex-col lg:flex-row  justify-between items-start lg:items-center mb-6 gap-4 lg:gap-0  w-full">
         {/* Welcome message */}
+
+      
 
         {/* <h1>  </h1> */}
         <h1 className="text-2xl font-bold">Questions</h1>
+
+        <div className="flex ">
+          <button
+            onClick={startQuiz}
+            className="px-3 py-1 bg-green-600 h-[50px] text-white rounded cursor-pointer"
+          >
+            Start Quiz
+          </button>
+        </div>
         <div className="flex gap-2">
-          <button onClick={openCreate} className="px-3 py-1 bg-green-600 text-white rounded">New Question</button>
-          <button onClick={startQuiz} className="px-3 py-1 bg-green-600 text-white rounded cursor-pointer">Start Quiz</button>
-          <button onClick={() => {
+          <Button onClick={openCreate} variant="success" className="px-3 py-1">
+            New Question
+          </Button>
 
-               logout();
-               showError("Logged out successfully");
-          }
-         
-
-            
-            } className="px-3 py-1 bg-red-500 text-white rounded">Logout</button>
-          
+          <Button
+            onClick={() => {
+              logout();
+              showError("Logged out successfully");
+            }}
+            variant="danger"
+            className="px-3 py-1"
+          >
+            Logout
+          </Button>
         </div>
       </header>
 
@@ -139,15 +180,35 @@ export default function QuestionsPage() {
                   <div className="font-medium">{q.question_text}</div>
                   <ul className="mt-2 space-y-1">
                     {q.options.map((o, i) => (
-                      <li key={i} className={i === q.correct_index ? "font-semibold text-green-600" : ""}>
+                      <li
+                        key={i}
+                        className={
+                          i === q.correct_index
+                            ? "font-semibold text-green-600"
+                            : ""
+                        }
+                      >
                         {String.fromCharCode(65 + i)}. {o}
                       </li>
                     ))}
                   </ul>
                 </div>
+
                 <div className="flex flex-col gap-2">
-                  <button onClick={() => openEdit(q)} className="px-2 py-1 bg-blue-500 text-white rounded">Edit</button>
-                  <button onClick={() => remove(q.id)} className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
+                  <Button
+                    onClick={() => openEdit(q)}
+                    variant="primary"
+                    className="px-2 py-1"
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    onClick={() => remove(q.id)}
+                    variant="danger"
+                    className="px-2 py-1"
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             </div>
@@ -159,12 +220,16 @@ export default function QuestionsPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-2xl rounded p-6">
-            <h3 className="text-xl font-semibold mb-3">{editing ? "Edit Question" : "New Question"}</h3>
+            <h3 className="text-xl font-semibold mb-3">
+              {editing ? "Edit Question" : "New Question"}
+            </h3>
             {error && <div className="text-sm text-red-600 mb-2">{error}</div>}
             <div className="space-y-3">
               <input
                 value={form.question_text}
-                onChange={(e) => setForm({ ...form, question_text: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, question_text: e.target.value })
+                }
                 className="w-full border px-3 py-2 rounded"
                 placeholder="Question text"
               />
@@ -188,8 +253,18 @@ export default function QuestionsPage() {
               </div>
 
               <div className="flex justify-end gap-2 mt-4">
-                <button onClick={() => setShowModal(false)} className="px-3 py-1 border rounded">Cancel</button>
-                <button onClick={save} className="px-3 py-1 bg-blue-600 text-white rounded">Save</button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-3 py-1 border rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={save}
+                  className="px-3 py-1 bg-blue-600 text-white rounded"
+                >
+                  Save
+                </button>
               </div>
             </div>
           </div>

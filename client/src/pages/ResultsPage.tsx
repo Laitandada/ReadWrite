@@ -1,5 +1,6 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
+import { Button } from "../components/Button";
 
 export default function ResultsPage() {
   const { state }: any = useLocation();
@@ -42,10 +43,14 @@ export default function ResultsPage() {
           <div className="font-mono">{fmt(timeTakenSeconds)}</div>
         </div>
 
-        <div className="flex gap-2 mt-4">
-          <button onClick={() => navigate("/questions")} className="px-3 py-1 border rounded">Manage Questions</button>
-          <button onClick={() => navigate("/quiz")} className="px-3 py-1 bg-blue-600 text-white rounded">Retake Quiz</button>
-        </div>
+       <div className="flex gap-2 mt-4">
+  <Button onClick={() => navigate("/questions")} variant="outline">
+    Manage Questions
+  </Button>
+  <Button onClick={() => navigate("/quiz")} variant="primary">
+    Retake Quiz
+  </Button>
+</div>
       </div>
     </div>
   );
