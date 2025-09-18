@@ -17,7 +17,8 @@
     "express-validator": "^6.15.0",
     "jsonwebtoken": "^9.0.0",
     "node-modules": "^1.0.1",
-    "pg": "^8.10.0"
+    "pg": "^8.10.0",
+       "@types/node": "^24.5.2"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -28,5 +29,9 @@
     "@types/pg": "^8.6.6",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
-  }
+  },
+  "engines": {
+  "node": "20.x"
+}
+
 }
