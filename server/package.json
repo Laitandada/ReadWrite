@@ -1,7 +1,7 @@
 {
   "name": "quiz-backend",
   "version": "1.0.0",
- "main": "dist/server.js",
+ "main": "src/server.js",
   "type": "module",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
@@ -29,9 +29,6 @@
     "@types/pg": "^8.6.6",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
-  },
-  "engines": {
-  "node": "20.x"
-}
+  }
 
 }
