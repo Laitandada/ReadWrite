@@ -6,6 +6,8 @@ import type { Question } from "../types/types";
 import { useNavigate } from "react-router-dom";
 import { showError } from "../utils/toastUtils";
 import { Button } from "../components/Button";
+import { useConfirm } from "../hooks/useConfirm";
+
 
 function BlankQuestion() {
   return {
@@ -25,7 +27,7 @@ export default function QuestionsPage() {
   const [form, setForm] = useState<any>(BlankQuestion());
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<string | null>(null);
-
+  const { confirm, ConfirmUI } = useConfirm();
   useEffect(() => {
     fetchQuestions();
   }, []);
@@ -113,7 +115,7 @@ export default function QuestionsPage() {
   }
 
   async function remove(id: number) {
-    if (!confirm("Delete this question?")) return;
+       if (!(await confirm("Delect this question"))) return;
     try {
       await api.delete(`/questions/${id}`);
       setQuestions((s) => s.filter((q) => q.id !== id));
@@ -155,6 +157,7 @@ export default function QuestionsPage() {
           <Button onClick={openCreate} variant="success" className="px-3 py-1">
             New Question
           </Button>
+        
 
           <Button
             onClick={() => {
@@ -211,8 +214,10 @@ export default function QuestionsPage() {
                   </Button>
                 </div>
               </div>
+                <ConfirmUI />
             </div>
           ))}
+          
         </div>
       )}
 

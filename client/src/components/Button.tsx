@@ -1,14 +1,6 @@
-import React from "react";
 
-type ButtonProps = {
-  children: React.ReactNode;
-  onClick?: () => void;
-  disabled?: boolean;
-  variant?: "primary" | "secondary" | "success" | "danger" | "outline";
-  className?: string;
-  type?: "button" | "submit" | "reset";
-  fullWidth?: boolean;
-};
+import type { ButtonProps } from "../types/types";
+
 
 export function Button({
   children,
@@ -19,7 +11,7 @@ export function Button({
   type = "button",
   fullWidth = false,
 }: ButtonProps) {
-  const base = "px-3 py-1 rounded font-medium cursor-pointer disabled:opacity-60";
+  const base = "px-3 py-1 rounded font-medium cursor-pointer  disabled:opacity-60";
 
   const variants = {
     primary: "bg-blue-600 text-white hover:bg-blue-700",

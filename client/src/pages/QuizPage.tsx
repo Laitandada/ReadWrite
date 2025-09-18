@@ -6,6 +6,7 @@ import Timer from "../components/Timer";
 import type { Question } from "../types/types";
 import { showError } from "../utils/toastUtils";
 import { Button } from "../components/Button";
+import { useConfirm } from "../hooks/useConfirm";
 
 export default function QuizPage() {
   const navigate = useNavigate();
@@ -21,6 +22,9 @@ export default function QuizPage() {
   const [elapsed, setElapsed] = useState(0);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [unansweredIds, setUnansweredIds] = useState<number[]>([]);
+
+  const { confirm, ConfirmUI } = useConfirm();
 
   useEffect(() => {
     fetchQuestions();
@@ -47,10 +51,21 @@ export default function QuizPage() {
 
   function handleSelect(questionId: number, idx: number) {
     selectAnswer(questionId, idx);
+    setUnansweredIds((prev) => prev.filter((id) => id !== questionId));
   }
 
   async function handleSubmit() {
-    if (!confirm("Submit quiz now?")) return;
+    const notAnswered = questions
+      .filter((q) => answers[q.id] === undefined)
+      .map((q) => q.id);
+
+    if (notAnswered.length > 0) {
+      setUnansweredIds(notAnswered);
+      showError("Please answer all questions before submitting");
+      return;
+    }
+
+    if (!(await confirm("Submit quiz now?"))) return;
 
     const payload = {
       answers: Object.entries(answers).map(([qId, selected]: any) => ({
@@ -59,14 +74,13 @@ export default function QuizPage() {
       })),
       timeTakenSeconds: elapsed,
     };
+
     try {
       setSubmitting(true);
       const res = await api.post("/quiz/submit", payload);
-
       navigate("/results", { state: { ...res.data } });
     } catch (err) {
       console.error(err);
-
       showError("Submit failed");
     } finally {
       setSubmitting(false);
@@ -90,8 +104,11 @@ export default function QuizPage() {
           <Timer onTick={onTick} />
         </div>
       </div>
-
-      <div className="border rounded p-6">
+      <div
+        className={`border rounded p-6 ${
+          unansweredIds.includes(q.id) ? "border-red-500 bg-red-50" : ""
+        }`}
+      >
         <div className="mb-4 font-medium">{q.question_text}</div>
         <div className="space-y-2">
           {q.options.map((opt, idx) => (
@@ -111,28 +128,32 @@ export default function QuizPage() {
             </label>
           ))}
         </div>
+        <div className="mt-4 flex justify-between">
+          {currentIndex > 0 ? (
+            <Button onClick={prev} variant="outline">
+              Previous
+            </Button>
+          ) : (
+            <div />
+          )}
 
-       <div className="mt-4 flex justify-between">
-  {currentIndex > 0 ? (
-    <Button onClick={prev} variant="outline">
-      Previous
-    </Button>
-  ) : (
-    <div />
-  )}
-
-  {currentIndex < questions.length - 1 ? (
-    <Button onClick={next} variant="primary">
-      Next
-    </Button>
-  ) : (
-    <Button onClick={handleSubmit} variant="success" disabled={submitting}>
-      {submitting ? "Submitting…" : "Submit Quiz"}
-    </Button>
-  )}
-</div>
-
+          {currentIndex < questions.length - 1 ? (
+            <Button onClick={next} variant="primary">
+              Next
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSubmit}
+              variant="success"
+              disabled={submitting}
+            >
+              {submitting ? "Submitting…" : "Submit Quiz"}
+            </Button>
+          )}
+        </div>
       </div>
+
+      <ConfirmUI />
     </div>
   );
 }

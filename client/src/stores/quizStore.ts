@@ -1,16 +1,6 @@
 import {create }from 'zustand';
-import type { Question } from '../types/types';
+import type {  QuizState } from '../types/types';
 
-interface QuizState {
-  questions: Question[];
-  currentIndex: number;
-  answers: Record<number, number | null>;
-  setQuestions: (q: Question[]) => void;
-  selectAnswer: (questionId: number, selectedIndex: number) => void;
-  next: () => void;
-  prev: () => void;
-  reset: () => void;
-}
 
 export const useQuizStore = create<QuizState>((set) => ({
   questions: [],
