@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     // File Layout
-   "outDir": "dist",
-    "rootDir": "src",
-
+  "rootDir": "src",
+    "outDir": "dist",
     // Environment Settings
     "module": "nodenext",
     "target": "es2022",
@@ -30,6 +29,6 @@
  
 
   },
-    "include": ["src"],
-  "exclude": ["node_modules"]
+ "include": ["src"],
+  "exclude": ["dist", "node_modules"]
 }
