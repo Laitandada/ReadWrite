@@ -9,7 +9,7 @@ export type ButtonProps = {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
-  variant?: "primary" | "secondary" | "success" | "danger" | "outline";
+  variant?: "primary" | "secondary" | "success" | "danger" | "outline" | "link";
   className?: string;
   type?: "button" | "submit" | "reset";
   fullWidth?: boolean;

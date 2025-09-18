@@ -38,7 +38,6 @@ export default function QuizPage() {
       setQuestions(res.data.questions as Question[]);
     } catch (err) {
       console.error(err);
-
       showError("Failed to load quiz");
     } finally {
       setLoading(false);
@@ -55,13 +54,14 @@ export default function QuizPage() {
   }
 
   async function handleSubmit() {
-    const notAnswered = questions
-      .filter((q) => answers[q.id] === undefined)
+   const notAnswered = questions
+      .filter((q) => answers[q.id] == null) 
       .map((q) => q.id);
 
     if (notAnswered.length > 0) {
       setUnansweredIds(notAnswered);
       showError("Please answer all questions before submitting");
+      console.log({ answers, notAnswered }); 
       return;
     }
 
@@ -104,6 +104,7 @@ export default function QuizPage() {
           <Timer onTick={onTick} />
         </div>
       </div>
+
       <div
         className={`border rounded p-6 ${
           unansweredIds.includes(q.id) ? "border-red-500 bg-red-50" : ""
@@ -114,13 +115,19 @@ export default function QuizPage() {
           {q.options.map((opt, idx) => (
             <label
               key={idx}
-              className="flex items-center gap-3 border p-3 rounded hover:bg-gray-50 cursor-pointer"
+              className={`flex items-center gap-3 border p-3 rounded cursor-pointer
+                ${
+                  answers[q.id] === idx
+                    ? "bg-blue-100 border-blue-500" 
+                    : "hover:bg-gray-50"
+                }`}
             >
               <input
                 type="radio"
                 name={`q-${q.id}`}
                 checked={answers[q.id] === idx}
                 onChange={() => handleSelect(q.id, idx)}
+                className="hidden"
               />
               <span>
                 {String.fromCharCode(65 + idx)}. {opt}
@@ -128,6 +135,7 @@ export default function QuizPage() {
             </label>
           ))}
         </div>
+
         <div className="mt-4 flex justify-between">
           {currentIndex > 0 ? (
             <Button onClick={prev} variant="outline">
@@ -145,7 +153,9 @@ export default function QuizPage() {
             <Button
               onClick={handleSubmit}
               variant="success"
-              disabled={submitting}
+              disabled={
+                submitting || Object.keys(answers).length !== questions.length
+              }
             >
               {submitting ? "Submitting…" : "Submit Quiz"}
             </Button>

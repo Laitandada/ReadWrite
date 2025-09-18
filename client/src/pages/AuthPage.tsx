@@ -4,6 +4,7 @@ import api from "../api/axios";
 import { useAuthStore } from "../stores/authStore";
 import { showError, showSuccess } from "../utils/toastUtils";
 import { Eye, EyeOff } from "lucide-react";
+import { Button } from "../components/Button";
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -97,27 +98,26 @@ export default function AuthPage() {
             </button>
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-60"
-            disabled={loading}
-          >
-            {loading
-              ? "Please wait..."
-              : mode === "login"
-              ? "Login"
-              : "Register"}
-          </button>
+         <Button
+  type="submit"
+  disabled={loading}
+  variant="primary"
+  fullWidth
+>
+  {loading ? "Please wait..." : mode === "login" ? "Login" : "Register"}
+</Button>
+
         </form>
 
         <div className="mt-4 text-sm text-center">
-          <button
-            onClick={() => setMode(mode === "login" ? "register" : "login")}
-            className="text-blue-600 underline"
-          >
-            {mode === "login" ? "Create an account" : "Have an account? Log in"}
-          </button>
-        </div>
+  <Button
+    onClick={() => setMode(mode === "login" ? "register" : "login")}
+    variant="link"
+  >
+    {mode === "login" ? "Create an account" : "Have an account? Log in"}
+  </Button>
+</div>
+
       </div>
     </div>
   );
